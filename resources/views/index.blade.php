@@ -10,7 +10,7 @@
     <style>
         .right-panel {
             min-width: 250px;
-            max-width: 650px;
+            max-width: 700px;
             overflow-y: auto;
             border-left: 1px solid #ddd;
         }
