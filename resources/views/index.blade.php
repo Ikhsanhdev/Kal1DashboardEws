@@ -8,10 +8,6 @@
     <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
     
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     
     <style>
         .right-panel {
@@ -24,7 +20,7 @@
             border-radius: 15px;
         }
         .filter-group {
-            display: none; /* Sembunyikan default, tapi nanti Dashboard Data default akan show via JS */
+            display: none;
         }
         
         /* Map legend styles */
@@ -74,6 +70,14 @@
             height: 20px;
             margin-right: 10px;
         }
+
+        /* Search control styles for Google Maps */
+        /* .search-control {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        } */
     </style>
 @endpush
 
@@ -139,26 +143,20 @@
     <div class="flex-grow-1 position-relative">
         <div id="map" style="height: 100%; width: 100%;"></div>
         
+        <!-- Search Control -->
+        {{-- <div class="search-control">
+            <input type="text" id="location-search" placeholder="Cari lokasi..." 
+                   style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div> --}}
+        
         <!-- Map Legend -->
         <div class="map-legend">
             <div class="legend-toggle" onclick="toggleMapLegend()">
-                <span><strong>Legends</strong></span>
+                <span><strong>Legenda</strong></span>
                 <i class="fas fa-chevron-up" id="legend-icon"></i>
             </div>
-            {{-- <div id="legend-content" class="legend-content">
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #90EE90;"></div>
-                    <span>Area Hijau</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #DDA0DD;"></div>
-                    <span>Area Ungu</span>
-                </div>
-                <div class="legend-item">
-                    <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" 
-                         class="legend-marker" alt="Blue marker">
-                    <span>Lokasi Utama</span>
-                </div> --}}
+            <div id="legend-content" class="legend-content">
+                <!-- Legend items akan di-generate oleh JavaScript -->
             </div>
         </div>
     </div>
@@ -173,87 +171,39 @@
     <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
     <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
     
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <!--  Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4jqcen5Xqrgck4V73aL6VepyKp2_wK1U&callback=initMap" async defer></script>
     
     <script>
         let map;
-        let markers;
-        let greenArea, purpleArea;
+        let markers = [];
+        let polygons = [];
+        let markerClusterer;
         
+        // Initialize Google Maps
+        function initMap() {
+            // Initialize map
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                center: { lat: -0.5, lng: 117 },
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            // Initialize marker clusterer (you'll need to include MarkerClusterer library)
+            // markerClusterer = new MarkerClusterer(map, [], {
+            //     imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+            // });
+
+            // Load data from Laravel backend
+            loadMapData();
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             // Saat load pertama, langsung tampilkan filter Dashboard Data
             document.getElementById('group-sebaran').style.display = 'block';
             document.getElementById('group-waktu').style.display = 'block';
             document.getElementById('group-view').style.display = 'block';
-            
-            // Initialize map
-            initializeMap();
         });
-
-        function initializeMap() {
-            // Initialize map
-            map = L.map('map').setView([-0.5, 117], 7); // Koordinat  zoom default 5
-
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                // attribution: '© OpenStreetMap contributors',
-                maxZoom: 18
-            }).addTo(map);
-
-            // Custom icons
-            var blueIcon = new L.Icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-
-            // Area polygons dengan warna seperti di gambar
-            // greenArea = L.polygon([
-            //     [[-2, 110], [-2, 115], [2, 115], [2, 110]]
-            // ], {
-            //     color: '#228B22',
-            //     fillColor: '#90EE90',
-            //     fillOpacity: 0.5,
-            //     weight: 2
-            // }).addTo(map);
-
-            // purpleArea = L.polygon([
-            //     [[0, 115], [0, 120], [3, 120], [3, 115]]
-            // ], {
-            //     color: '#800080',
-            //     fillColor: '#DDA0DD',
-            //     fillOpacity: 0.5,
-            //     weight: 2
-            // }).addTo(map);
-
-            // Add markers
-            markers = L.markerClusterGroup();
-
-            // Sample markers data
-            var markersData = [
-                {lat: -1, lng: 112, title: "Lokasi 1", description: "Deskripsi lokasi 1"},
-                {lat: 0.5, lng: 114, title: "Lokasi 2", description: "Deskripsi lokasi 2"},
-                {lat: 1, lng: 116, title: "Lokasi 3", description: "Deskripsi lokasi 3"},
-                // Tambahkan data marker lainnya
-            ];
-
-            // Add markers to cluster group
-            markersData.forEach(function(markerData) {
-                var marker = L.marker([markerData.lat, markerData.lng], {icon: blueIcon})
-                    .bindPopup(`<b>${markerData.title}</b><br>${markerData.description}`);
-                markers.addLayer(marker);
-            });
-
-            map.addLayer(markers);
-            
-            // Load data from Laravel backend
-            loadMapData();
-        }
 
         // Legend toggle function
         function toggleMapLegend() {
@@ -275,46 +225,238 @@
                 .then(response => response.json())
                 .then(data => {
                     // Clear existing markers
-                    markers.clearLayers();
-                    
-                    // Custom icon for dynamic data
-                    var blueIcon = new L.Icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    });
+                    clearMarkers();
+                    clearPolygons();
                     
                     // Add new markers
                     data.locations.forEach(function(location) {
-                        var marker = L.marker([location.latitude, location.longitude], {icon: blueIcon})
-                            .bindPopup(`<b>${location.name}</b><br>${location.description}`);
-                        markers.addLayer(marker);
+                        var marker = new google.maps.Marker({
+                            position: { lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) },
+                            map: map,
+                            title: location.name,
+                            icon: {
+                                url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                                scaledSize: new google.maps.Size(40, 40)
+                            }
+                        });
+
+                        // Add info window
+                        var infoWindow = new google.maps.InfoWindow({
+                            content: `<div><strong>${location.name}</strong><br>${location.description}</div>`
+                        });
+
+                        marker.addListener('click', function() {
+                            infoWindow.open(map, marker);
+                        });
+
+                        markers.push(marker);
                     });
+
+                    // Add polygons/areas
+                    if (data.areas) {
+                        data.areas.forEach(function(area) {
+                            var coordinates = area.coordinates.map(coord => ({
+                                lat: parseFloat(coord[0]),
+                                lng: parseFloat(coord[1])
+                            }));
+
+                            var polygon = new google.maps.Polygon({
+                                paths: coordinates,
+                                strokeColor: area.color,
+                                strokeOpacity: 0.8,
+                                strokeWeight: 2,
+                                fillColor: area.color,
+                                fillOpacity: 0.35
+                            });
+
+                            polygon.setMap(map);
+                            polygons.push(polygon);
+                        });
+                    }
+
+                    // Update legend
+                    updateLegend(data);
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        // Clear all markers
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        // Clear all polygons
+        function clearPolygons() {
+            polygons.forEach(polygon => polygon.setMap(null));
+            polygons = [];
+        }
+
+        // Update legend based on data
+        function updateLegend(data) {
+            const legendContent = document.getElementById('legend-content');
+            let legendHTML = '';
+
+            // Add marker legend
+            legendHTML += `
+                <div class="legend-item">
+                    <img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" 
+                         class="legend-marker" alt="Blue marker" style="width: 20px; height: 20px;">
+                    <span>Lokasi Data</span>
+                </div>
+            `;
+
+            // Add area legends
+            if (data.areas) {
+                data.areas.forEach(area => {
+                    legendHTML += `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: ${area.color};"></div>
+                            <span>${area.name}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            legendContent.innerHTML = legendHTML;
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('location-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    // Implement search logic here
+                    searchLocations(searchTerm);
+                });
+            }
+        });
+
+        function searchLocations(searchTerm) {
+            // Filter markers based on search term
+            markers.forEach(marker => {
+                const title = marker.getTitle().toLowerCase();
+                if (title.includes(searchTerm) || searchTerm === '') {
+                    marker.setVisible(true);
+                } else {
+                    marker.setVisible(false);
+                }
+            });
         }
 
         // Function to update map based on dashboard type and filters
         function updateMapData() {
             const dashboardType = document.getElementById('dashboard-type').value;
             
-            // You can add logic here to update map data based on selected filters
-            // For example:
-            // - Different markers for different dashboard types
-            // - Filter markers based on selected criteria
-            // - Update polygon areas based on filters
-            
-            loadMapData(); // Reload data for now
+            // Fetch filtered data
+            const filters = {
+                dashboard_type: dashboardType,
+                sebaran: document.getElementById('filter-sebaran')?.value || '',
+                waktu: document.getElementById('filter-waktu')?.value || '',
+                view: document.getElementById('filter-view')?.value || '',
+                kategori_cctv: document.getElementById('filter-kategori-cctv')?.value || '',
+                wilayah: document.getElementById('filter-wilayah')?.value || '',
+                ews_type: document.getElementById('filter-ews-type')?.value || ''
+            };
+
+            fetch('/api/filtered-map-data?' + new URLSearchParams(filters))
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing data
+                    clearMarkers();
+                    clearPolygons();
+                    
+                    // Add filtered markers and areas
+                    // Similar logic as loadMapData() but with filtered data
+                    loadFilteredData(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function loadFilteredData(data) {
+            // Add markers
+            data.locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) },
+                    map: map,
+                    title: location.name,
+                    icon: getMarkerIcon(location.type)
+                });
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: `<div><strong>${location.name}</strong><br>${location.description}</div>`
+                });
+
+                marker.addListener('click', function() {
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+            });
+
+            // Add areas
+            if (data.areas) {
+                data.areas.forEach(function(area) {
+                    var coordinates = area.coordinates.map(coord => ({
+                        lat: parseFloat(coord[0]),
+                        lng: parseFloat(coord[1])
+                    }));
+
+                    var polygon = new google.maps.Polygon({
+                        paths: coordinates,
+                        strokeColor: area.color,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: area.color,
+                        fillOpacity: 0.35
+                    });
+
+                    polygon.setMap(map);
+                    polygons.push(polygon);
+                });
+            }
+
+            updateLegend(data);
+        }
+
+        // Get marker icon based on type
+        function getMarkerIcon(type) {
+            const iconMap = {
+                'forest': 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                'cctv': 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                'ews': 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                'default': 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            };
+
+            return {
+                url: iconMap[type] || iconMap['default'],
+                scaledSize: new google.maps.Size(40, 40)
+            };
         }
 
         // Add event listeners for filter changes
-        document.getElementById('dashboard-type').addEventListener('change', function() {
-            updateMapData();
+        document.addEventListener('DOMContentLoaded', function() {
+            const dashboardTypeSelect = document.getElementById('dashboard-type');
+            if (dashboardTypeSelect) {
+                dashboardTypeSelect.addEventListener('change', updateMapData);
+            }
+
+            // Add event listeners for other filters
+            const filterIds = [
+                'filter-sebaran', 'filter-waktu', 'filter-view',
+                'filter-kategori-cctv', 'filter-wilayah', 'filter-view-cctv',
+                'filter-ews-type'
+            ];
+
+            filterIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', updateMapData);
+                }
+            });
         });
     </script>
     
     @vite(['resources/js/index.js'])
-@endpush
+@endpush    

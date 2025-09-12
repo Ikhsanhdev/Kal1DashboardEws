@@ -8,35 +8,17 @@ class MapController extends Controller
 {
     public function getMapData()
     {
-        // Ambil data 
         $locations = [
             [
                 'id' => 1,
-                'name' => 'Hutan Eucalyptus',
+                'name' => 'HuEucalyptus',
                 'latitude' => -1.0,
                 'longitude' => 112.0,
                 'description' => 'Area hutan eucalyptus',
                 'type' => 'forest'
             ],
-            [
-                'id' => 2,
-                'name' => 'Area Konservasi',
-                'latitude' => 0.5,
-                'longitude' => 114.0,
-                'description' => 'Area konservasi alam',
-                'type' => 'conservation'
-            ],
-
-            [
-                'id' => 3,
-                'name' => 'Gedung sate',
-                'latitude' => -6.9022137586925805, 
-                'longitude' => 107.61914164363384,
-                'description' => 'Bandung',
-                'type' => 'conservation'
-            ],
             
-            // Tambahkan data lainnya dari database
+            
         ];
 
         return response()->json([
@@ -50,23 +32,87 @@ class MapController extends Controller
                     ],
                     'color' => '#90EE90'
                 ],
-                [
-                    'name' => 'Area Ungu',
-                    'type' => 'conservation',
-                    'coordinates' => [
-                        [0, 115], [0, 120], [3, 120], [3, 115]
-                    ],
-                    'color' => '#DDA0DD'
-                ],
-                [
-                    'name' => 'Area blanding',
-                    'type' => 'city',
-                    'coordinates' => [
-                        [-6.9, 107.6], [-6.9, 107.7], [-6.8, 107.7], [-6.8, 107.6]
-                    ],
-                    'color' => '#a0ddd6'
-                ]
+                
             ]
         ]);
+    }
+
+    public function index()
+    {
+        return view('dashboard.index', [
+            'google_maps_key' => config('AIzaSyD4jqcen5Xqrgck4V73aL6VepyKp2_wK1U&callback=initMap')
+        ]);
+    }
+
+    public function getFilteredMapData(Request $request)
+    {
+        $dashboardType = $request->get('dashboard_type');
+        $filters = $request->only(['sebaran', 'waktu', 'view', 'kategori_cctv', 'wilayah', 'ews_type']);
+        
+        $locations = collect([
+            [
+                'id' => 1,
+                'name' => 'H',
+                'latitude' => -1.0,
+                'longitude' => 112.0,
+                'description' => 'Area hutan eucalyptus',
+                'type' => 'forest',
+                'dashboard_type' => 'dashboard-data'
+            ],
+            
+        ]);
+
+        if ($dashboardType) {
+            $locations = $locations->where('dashboard_type', $dashboardType);
+        }
+
+        if ($request->has('type')) {
+            $locations = $locations->where('type', $request->get('type'));
+        }
+
+        return response()->json([
+            'locations' => $locations->values()->all(),
+            'areas' => $this->getAreasForDashboardType($dashboardType),
+            'filters_applied' => $filters
+        ]);
+    }
+
+    private function getAreasForDashboardType($dashboardType)
+    {
+        $allAreas = [
+            'dashboard-data' => [
+                [
+                    'name' => 'Area Hijau',
+                    'type' => 'forest',
+                    'coordinates' => [
+                        [-2, 110], [-2, 115], [2, 115], [2, 110]
+                    ],
+                    'color' => '#90EE90'
+                ],
+                
+            ],
+            'dashboard-cctv' => [
+                [
+                    'name' => 'Zona CCTV A',
+                    'type' => 'surveillance',
+                    'coordinates' => [
+                        [-1, 113], [-1, 116], [1, 116], [1, 113]
+                    ],
+                    'color' => '#FF6B6B'
+                ]
+            ],
+            'ews' => [
+                [
+                    'name' => 'Area Rawan Bencana',
+                    'type' => 'hazard',
+                    'coordinates' => [
+                        [-7, 107], [-7, 108], [-6.5, 108], [-6.5, 107]
+                    ],
+                    'color' => '#FFD93D'
+                ]
+            ]
+        ];
+
+        return $allAreas[$dashboardType] ?? $allAreas['dashboard-data'];
     }
 }

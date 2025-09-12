@@ -1,28 +1,115 @@
-// Add search functionality
-function addSearchControl() {
-    var searchControl = L.control({ position: "topright" });
+// Variabel global
+let map;
+let highlightCircle = null;
 
-    searchControl.onAdd = function (map) {
-        var div = L.DomUtil.create("div", "search-control");
-        div.innerHTML = `
-            <input type="text" id="location-search" placeholder="Cari lokasi..." 
-                   style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-        `;
-        return div;
-    };
+// Fungsi untuk membuat circle highlight
+function createHighlightCircle(highlightData) {
+    // Hapus circle sebelumnya jika ada
+    if (highlightCircle) {
+        highlightCircle.setMap(null);
+    }
 
-    searchControl.addTo(map);
+    // Buat circle baru
+    highlightCircle = new google.maps.Circle({
+        strokeColor: highlightData.color,
+        strokeOpacity: 0.8,
+        strokeWeight: highlightData.strokeWeight,
+        fillColor: highlightData.fillColor,
+        fillOpacity: highlightData.fillOpacity,
+        map: map,
+        center: {
+            lat: highlightData.center_lat,
+            lng: highlightData.center_lng,
+        },
+        radius: highlightData.radius,
+    });
 
-    // Search functionality
-    document
-        .getElementById("location-search")
-        .addEventListener("input", function (e) {
-            var searchTerm = e.target.value.toLowerCase();
-            // Implement search logic here
+    // Tambahkan info window
+    const infoWindow = new google.maps.InfoWindow({
+        content: `<div><strong>${highlightData.name}</strong><br>Radius: ${
+            highlightData.radius / 1000
+        }km</div>`,
+    });
+
+    // Event listener untuk click
+    highlightCircle.addListener("click", function (event) {
+        infoWindow.setPosition(event.latLng);
+        infoWindow.open(map);
+    });
+
+    console.log(
+        "Highlight circle created at:",
+        highlightData.center_lat,
+        highlightData.center_lng
+    );
+}
+
+// Fungsi untuk load map data
+function loadMapData(dashboardType = "dashboard-data") {
+    const url = dashboardType
+        ? `/api/filtered-map-data?dashboard_type=${dashboardType}`
+        : "/api/map-data";
+
+    fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Received data:", data);
+
+            // Render highlight area
+            if (data.highlight_area) {
+                createHighlightCircle(data.highlight_area);
+                console.log("Creating highlight circle...");
+            } else {
+                console.log("No highlight_area found in response");
+            }
+
+            // Render markers jika ada
+            if (data.locations && data.locations.length > 0) {
+                renderMarkers(data.locations);
+            }
+        })
+        .catch((error) => {
+            console.error("Error loading map data:", error);
         });
 }
 
+// Fungsi untuk render markers
+function renderMarkers(locations) {
+    locations.forEach((location) => {
+        const marker = new google.maps.Marker({
+            position: { lat: location.latitude, lng: location.longitude },
+            map: map,
+            title: location.name,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<div><strong>${location.name}</strong><br>${location.description}</div>`,
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+        });
+    });
+}
+
+// Fungsi untuk inisialisasi map (Google Maps)
+function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 8,
+        center: { lat: -6.914744, lng: 107.60981 }, // Center on Bandung
+        mapTypeId: "terrain",
+    });
+
+    console.log("Map initialized");
+
+    // Load data setelah map ready
+    loadMapData("dashboard-data");
+}
+
+// jQuery ready function
 $(document).ready(function () {
+    console.log("Document ready");
+
     const options = {
         "dashboard-data": {
             sebaran: [
@@ -70,20 +157,29 @@ $(document).ready(function () {
         }
     }
 
-    // Inisialisasi select kecuali dashboard-type
+    // Inisialisasi select
     $("select").not("#dashboard-type").selectize({
         create: false,
         sortField: "text",
     });
 
-    // Inisialisasi dashboard-type
+    // Dashboard type select dengan event
     let dashboardTypeSelect = $("#dashboard-type").selectize({
         create: false,
         sortField: "text",
         placeholder: "Pilih Dashboard",
         onChange: function (value) {
+            console.log("Dashboard type changed to:", value);
+
             $(".filter-group").hide();
+
+            // Load map data untuk dashboard type yang dipilih
+            if (map) {
+                loadMapData(value);
+            }
+
             if (!value || !options[value]) return;
+
             switch (value) {
                 case "dashboard-data":
                     showSelect("#filter-sebaran", options[value].sebaran);
@@ -110,6 +206,9 @@ $(document).ready(function () {
         },
     })[0].selectize;
 
-    // ==== Set default Dashboard Type saat load ====
-    dashboardTypeSelect.setValue("dashboard-data"); // ini akan otomatis trigger onChange
+    // Set default
+    dashboardTypeSelect.setValue("dashboard-data");
 });
+
+// Pastikan initMap tersedia secara global
+window.initMap = initMap;

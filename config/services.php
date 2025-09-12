@@ -31,4 +31,8 @@ return [
         ],
     ],
 
+    'google_maps' => [
+        'api_key' => env('AIzaSyD4jqcen5Xqrgck4V73aL6VepyKp2_wK1U&callback=initMap'),
+    ],
+
 ];
