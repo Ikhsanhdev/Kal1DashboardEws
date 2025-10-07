@@ -11,7 +11,10 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "datatables.net": "^2.3.4",
+        "datatables.net-dt": "^2.3.4",
         "jquery": "^3.7.1",
+        "jquery-knob": "^1.2.11",
         "select2": "^4.1.0-rc.0",
         "selectize": "^0.12.6"
     }
