@@ -1,19 +1,16 @@
+// ==========================================================
 // resources/js/map/markers.js
-//import { loadRegionData } from "../tables/dashboard-table.js";
+// ==========================================================
 
-// Tambah wilayah ke Blue Box
-export function addRegionToList(regionId, regionName) {
-    if ($(`#region-list li[data-id="${regionId}"]`).length === 0) {
-        $("#region-list").append(`
-            <li class="list-group-item region-item" data-id="${regionId}">
-                ${regionName}
-            </li>
-        `);
-    }
+// 🔹 Dipanggil saat area di peta diklik
+export function addRegionToList(id, name) {
+  console.log(`🟢 Klik area: ${name} (ID: ${id})`);
+
+  // 🔹 Tampilkan ke daftar HTML jika elemen tersedia
+  const listEl = document.getElementById("region-list");
+  if (!listEl) return;
+
+  const item = document.createElement("li");
+  item.textContent = `${name} (ID: ${id})`;
+  listEl.appendChild(item);
 }
-
-// Klik item di Blue Box → load data ke tabel
-$(document).on("click", ".region-item", function() {
-    const regionId = $(this).data("id");
-    loadRegionData(regionId);
-});

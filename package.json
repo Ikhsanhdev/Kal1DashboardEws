@@ -16,6 +16,7 @@
         "jquery": "^3.7.1",
         "jquery-knob": "^1.2.11",
         "select2": "^4.1.0-rc.0",
-        "selectize": "^0.12.6"
+        "selectize": "^0.12.6",
+        "xlsx": "^0.18.5"
     }
 }

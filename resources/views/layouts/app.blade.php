@@ -4,119 +4,91 @@
     <meta charset="UTF-8">
     <title>@yield('title', 'My App')</title>
     <link rel="icon" href="{{ asset('assets/images/logo-pu.png') }}" type="image/png">
-    <link rel="shortcut icon" href="{{ asset('assets/images/logo-pu.png') }}">
-
-    <link href="{{ asset('assets/libs/morris.js/morris.css') }}" rel="stylesheet" type="text/css" />
+    
+    <!-- ====== CSS Utama ====== -->
     <link href="{{ asset('assets/css/style.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-         crossorigin=""/>
-    
-    <!-- Plugin untuk marker clustering (optional) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <!-- ====== Leaflet CSS ====== -->
+    <link rel="stylesheet" 
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
 
-    <!-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> -->
+    <!-- (Opsional) Tambahkan marker cluster jika digunakan -->
+    {{-- 
+    <link rel="stylesheet" 
+          href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" 
+          href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    --}}
+
     @stack('styles')
 </head>
 <body>
     <div class="layout-wrapper">
         <div class="page-content">
+
+            <!-- ==================== Navbar ==================== -->
             <div class="navbar-custom">
-                <div class="topbar">
-                    <div class="topbar-menu d-flex align-items-center gap-lg-2 gap-1">
-                        <!-- Brand Logo -->
-                        <div class="logo-box">
-                            <!-- Brand Logo Light -->
-                            <a href="/" class="logo-light">
-                                <img src="{{ asset('assets/images/logo-pu.png') }}" alt="logo" class="logo-lg" height="22">
-                                <img src="{{ asset('assets/images/logo-pu.png') }}" alt="small logo" class="logo-sm" height="22">
-                            </a>
-
-                            <!-- Brand Logo Dark -->
-                            <a href="/" class="logo-dark">
-                                <img src="{{ asset('assets/images/logo-pu.png') }}" alt="dark logo" class="logo-lg" height="22">
-                                <img src="{{ asset('assets/images/logo-pu.png') }}" alt="small logo" class="logo-sm" height="22">
-                            </a>
+                <div class="topbar d-flex align-items-center justify-content-between px-3 py-2">
+                    
+                    <!-- Logo dan Identitas -->
+                    <a href="/" class="d-flex align-items-center text-decoration-none">
+                        <img src="{{ asset('assets/images/logo-pu.png') }}" alt="logo" height="45" class="me-2">
+                        <div>
+                            <div class="fw-bold text-uppercase" style="font-size:13px; color:#0c4a6e;">
+                                BALAI WILAYAH SUNGAI KALIMANTAN I
+                            </div>
+                            <div style="font-size:11px; color:#1d77ac;">
+                                Direktorat Jenderal Sumber Daya Air<br>
+                                Kementerian Pekerjaan Umum dan Perumahan Rakyat
+                            </div>
                         </div>
+                    </a>
 
-                        <a href="index.html" class="logo-light d-flex align-items-center" style="border-radius: 5px;">
-                            <img src="{{ asset('assets/images/logo-pu.png') }}" alt="logo" class="logo-lg" height="45" style="margin-right: 10px;">
-
-                            <div class="text-start logo-lg">
-                                <div class="mb-0 fw-bold text-uppercase" style="font-size: 13px; color: #0c4a6e;">BALAI WILAYAH SUNGAI KALIMANTAN I</div>
-                                <div style="font-size: 11px; color: #1d77ac;">
-                                    Direktorat Jenderal Sumber Daya Air<br />
-                                    Kementrian Pekerjaan Umum dan Perumahan Rakyat
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <ul class="topbar-menu d-flex align-items-center gap-4">
-                        <li class="dropdown">
-                            <a class="nav-link " href="/LandingPage/Tabulasi">
-                                <i class="mdi mdi-monitor font-size-20" style="padding-right: 5px;"></i>
-                                Dashboard Monitoring
+                    <!-- Menu kanan -->
+                    <ul class="topbar-menu d-flex align-items-center gap-3 mb-0 list-unstyled">
+                        <li>
+                            <a class="nav-link d-flex align-items-center" href="/LandingPage/Tabulasi">
+                                <i class="mdi mdi-monitor font-size-20 me-1"></i> Dashboard Monitoring
                             </a>
                         </li>
-                        <li class="d-none d-md-inline-block">
-                            <a class="nav-link" href="" data-bs-toggle="fullscreen">
-                                <i class="mdi mdi-fullscreen font-size-24"></i>
+                        <li>
+                            <a class="nav-link" href="#" data-bs-toggle="fullscreen" title="Fullscreen">
+                                <i class="mdi mdi-fullscreen font-size-22"></i>
                             </a>
                         </li>
-
-                        <li class="dropdown d-none d-md-inline-block">
-                            <a class="nav-link dropdown-toggle waves-effect waves-light arrow-none"
-                                data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false"
-                                aria-expanded="false">
-                                <img src="{{ asset('assets/images/flags/id.png') }}" alt="user-image" class="me-0 me-sm-1" height="18">
+                        <li>
+                            <a class="nav-link" id="theme-mode" title="Mode Gelap / Terang">
+                                <i class="bx bx-moon font-size-22"></i>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated">
-                                <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item">
-                                    <img src="{{ asset('assets/images/flags/us.jpg') }}" alt="user-image" class="me-1"
-                                        height="12"> <span class="align-middle">US</span>
-                                </a>
-                            </div>
-                        </li>
-
-                        <li class="nav-link" id="theme-mode">
-                            <i class="bx bx-moon font-size-24"></i>
                         </li>
                     </ul>
                 </div>
             </div>
+            <!-- ==================== End Navbar ==================== -->
 
+            <!-- Konten Halaman -->
             @yield('content')
         </div>
     </div>
 
+    <!-- ========== Script Utama Laravel ========== -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
     <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 
-    <script src="{{ asset('assets/libs/jquery-knob/jquery.knob.min.js') }}"></script>
-
-    <!-- Sparkline Js-->
-    <script src="{{ asset('assets/libs/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/morris.js/morris.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/raphael/raphael.min.js') }}"></script>
-
-    <!-- Leaflet JS -->
+    <!-- ========== Leaflet JS ========== -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-         crossorigin=""></script>
-    
-    <!-- Plugin untuk marker clustering (optional) -->
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+
+    <!-- (Opsional) Aktifkan marker cluster jika digunakan -->
+    {{-- 
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster-src.js"></script>
+    --}}
 
     @stack('scripts')
-    <!-- Dashboard init-->
-    <!-- <script src="{{ asset('assets/js/config.js') }}"></script>
-    <script src="~/hkasumatera7/assets/js/pages/dashboard.js"></script> -->
 </body>
 </html>

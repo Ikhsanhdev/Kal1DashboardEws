@@ -1,12 +1,16 @@
 import $ from "jquery";
 import "selectize";
+import { applyCctvView } from "../dashboards/cctv.js";
 
-// =============================
-// Inisialisasi Filters
-// =============================
+// =====================================================
+// 📦 Inisialisasi Filters
+// =====================================================
 export function initFilters() {
     console.log("✅ Filters initialized");
 
+    // =====================================================
+    // 🔹 Opsi Filter per Dashboard
+    // =====================================================
     const options = {
         "dashboard-data": {
             sebaran: [
@@ -22,7 +26,7 @@ export function initFilters() {
         "dashboard-cctv": {
             kategori: ["Kategori A", "Kategori B", "Kategori C"],
             wilayah: ["Wilayah I", "Wilayah II", "Wilayah III"],
-            view: ["CCTV Only", "CCTV + Data"],
+            view: ["Maps + CCTV", "Maps Only", "CCTV Only"],
         },
         ews: {
             ewstype: [
@@ -34,134 +38,167 @@ export function initFilters() {
         },
     };
 
-    // =============================
-    // Helper untuk isi selectize
-    // =============================
-    function showSelect(selector, items) {
-        const element = $(selector)[0];
-        if (!element || !element.selectize) return;
+    // =====================================================
+    // 🔹 Helper: Isi selectize dengan item dinamis
+    // =====================================================
+    const showSelect = (selector, items) => {
+        const $select = $(selector);
+        if (!$select.length || !$select[0].selectize) return;
 
-        const selectize = element.selectize;
+        const selectize = $select[0].selectize;
         selectize.clearOptions();
 
-        items.forEach((item) =>
+        items.forEach((item) => {
             selectize.addOption({
                 value: item.trim().toLowerCase().replace(/\s+/g, "-"),
                 text: item,
-            })
-        );
+            });
+        });
 
         selectize.refreshOptions(false);
-        if (items.length > 0)
-            selectize.setValue(
-                items[0].trim().toLowerCase().replace(/\s+/g, "-")
-            );
-    }
 
-    // =============================
-    // Kontrol tampilan View (Table/Map)
-    // =============================
-    function applyView(selected) {
+        if (items.length > 0) {
+            const firstValue = items[0].trim().toLowerCase().replace(/\s+/g, "-");
+            selectize.setValue(firstValue);
+        }
+    };
+
+    // =====================================================
+    // 🔹 Kontrol tampilan View (khusus Dashboard Data)
+    // =====================================================
+    const applyView = (selected) => {
         const tableContainer = document.getElementById("table-container");
         const mapContainer = document.getElementById("map-container");
 
         if (!tableContainer || !mapContainer) return;
 
-        // Reset dulu
+        // Sembunyikan semua dulu
         tableContainer.style.display = "none";
         mapContainer.style.display = "none";
-        tableContainer.style.height = "250px";
-        mapContainer.style.height = "calc(100% - 250px)";
 
-        if (selected === "table-only") {
-            tableContainer.style.display = "block";
-            tableContainer.style.height = "100%";   // Table full
-        } else if (selected === "map-only") {
-            mapContainer.style.display = "block";
-            mapContainer.style.height = "100%";     // Map full
-        } else {
-            // Table + Maps
-            tableContainer.style.display = "block";
-            mapContainer.style.display = "block";
+        // Tampilkan sesuai pilihan
+        switch (selected) {
+            case "table-only":
+                tableContainer.style.display = "block";
+                tableContainer.style.height = "100%";
+                break;
+
+            case "map-only":
+                mapContainer.style.display = "block";
+                mapContainer.style.height = "100%";
+                break;
+
+            default: // Table + Maps
+                tableContainer.style.display = "block";
+                mapContainer.style.display = "block";
+                tableContainer.style.height = "250px";
+                mapContainer.style.height = "calc(100% - 250px)";
+                break;
         }
-    }
+    };
 
-    // =============================
-    // Switch antar dashboard layout
-    // =============================
-    function switchDashboardLayout(type) {
+    // =====================================================
+    // 🔹 Switch antar Dashboard Layout
+    // =====================================================
+    const switchDashboardLayout = (type) => {
         $(".dashboard-container").hide();
 
-        if (type === "dashboard-data") {
-            $("#dashboard-data-container").show();
-        } else if (type === "dashboard-cctv") {
-            $("#dashboard-cctv-container").show();
-        } else if (type === "ews") {
-            $("#dashboard-ews-container").show();
-        }
-    }
+        switch (type) {
+            case "dashboard-data":
+                $("#dashboard-data-container").show();
+                break;
 
-    // =============================
-    // Inisialisasi Selectize
-    // =============================
+            case "dashboard-cctv":
+                $("#dashboard-cctv-container").show();
+                break;
+
+            case "ews":
+                $("#dashboard-ews-container").show();
+                break;
+        }
+    };
+
+    // =====================================================
+    // 🔹 Inisialisasi semua Selectize (kecuali dashboard-type)
+    // =====================================================
     $("select").not("#dashboard-type").selectize({
         create: false,
         sortField: "text",
     });
 
+    // =====================================================
+    // 🔹 Inisialisasi Selectize utama (Dashboard Type)
+    // =====================================================
     const dashboardTypeSelect = $("#dashboard-type")
         .selectize({
             create: false,
             sortField: "text",
             placeholder: "Pilih Dashboard",
-            onChange: function (value) {
-                $(".filter-group").hide();
-                switchDashboardLayout(value); // 🔹 Ganti layout
+            onChange(value) {
+                // Sembunyikan semua group filter lain
+                $(".filter-group").not(":has(#dashboard-type)").hide();
 
-                // 🔹 Load data map (jika ada)
-                if (typeof window.loadMapData === "function") {
-                    window.loadMapData(value);
-                }
+                // Tampilkan layout dashboard sesuai pilihan
+                switchDashboardLayout(value);
 
                 if (!value || !options[value]) return;
 
                 switch (value) {
-                    case "dashboard-data":
+                    // ========================================
+                    // 🟦 DASHBOARD DATA
+                    // ========================================
+                    case "dashboard-data": {
                         showSelect("#filter-sebaran", options[value].sebaran);
                         showSelect("#filter-waktu", options[value].waktu);
                         showSelect("#filter-view", options[value].view);
+
                         $("#group-sebaran, #group-waktu, #group-view").show();
 
-                        // Listener untuk filter View
                         const viewSelect = $("#filter-view")[0].selectize;
-                        viewSelect.off("change"); // reset listener lama
-                        viewSelect.on("change", function (val) {
-                            applyView(val);
-                        });
+                        if (viewSelect) {
+                            viewSelect.off("change");
+                            viewSelect.on("change", (val) => applyView(val));
+                        }
 
-                        // Set awal → Table + Maps
                         applyView("table-+-maps");
                         break;
+                    }
 
-                    case "dashboard-cctv":
+                    // ========================================
+                    // 🟨 DASHBOARD CCTV
+                    // ========================================
+                    case "dashboard-cctv": {
                         showSelect("#filter-kategori-cctv", options[value].kategori);
                         showSelect("#filter-wilayah", options[value].wilayah);
                         showSelect("#filter-view-cctv", options[value].view);
-                        $("#group-kategori-cctv, #group-wilayah, #group-view-cctv").show();
-                        break;
 
-                    case "ews":
+                        $("#group-kategori-cctv, #group-wilayah, #group-view-cctv").show();
+
+                        const cctvViewSelect = $("#filter-view-cctv")[0].selectize;
+                        if (cctvViewSelect) {
+                            cctvViewSelect.off("change");
+                            cctvViewSelect.on("change", (val) => applyCctvView(val));
+                        }
+
+                        applyCctvView("maps-+-cctv");
+                        break;
+                    }
+
+                    // ========================================
+                    // 🟥 DASHBOARD EWS
+                    // ========================================
+                    case "ews": {
                         showSelect("#filter-ews-type", options[value].ewstype);
                         $("#group-ews-type").show();
                         break;
+                    }
                 }
             },
-        })[0]
-        .selectize;
+        })[0].selectize;
 
-    // =============================
-    // Set default dashboard
-    // =============================
+    // =====================================================
+    // 🔹 Set Default Dashboard (Data)
+    // =====================================================
     dashboardTypeSelect.setValue("dashboard-data");
     dashboardTypeSelect.onChange("dashboard-data");
 }
