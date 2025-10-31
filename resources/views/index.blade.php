@@ -105,9 +105,15 @@
 
         {{-- === Dashboard: CCTV === --}}
         <div id="dashboard-cctv-container" class="dashboard-container">
-            <div id="cctv-slider"></div>
-            <div id="cctv-map" class="dashboard-card flex-grow-1" style="height: 600px;"></div>
-        </div>
+    <div class="dashboard-card mb-3 p-2">
+        <div id="cctv-slider" class="d-flex align-items-center justify-content-between"></div>
+    </div>
+
+    <div class="dashboard-card p-2" style="height: 600px;">
+        <div id="cctv-map" class="w-100 h-100"></div>
+    </div>
+</div>
+
 
         {{-- === Dashboard: EWS === --}}
         <div id="dashboard-ews-container" class="dashboard-container">

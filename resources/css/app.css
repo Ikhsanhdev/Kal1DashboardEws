@@ -1,7 +1,13 @@
+/* ==========================================================
+   GLOBAL LAYOUT
+   ========================================================== */
 html, body {
     height: 100%;
     overflow: hidden;
     background: #f5f6fa;
+    font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #333;
+    margin: 0;
 }
 
 .d-flex.h-100 {
@@ -9,19 +15,23 @@ html, body {
     overflow: hidden;
 }
 
-/* Sidebar Filter Panel */
+/* ==========================================================
+   SIDEBAR FILTER PANEL
+   ========================================================== */
 .right-panel {
     min-width: 340px;
     max-width: 400px;
     border-right: 1px solid #e0e0e0;
     background: #fff;
     padding: 18px;
-    border-radius: 12px;
+    border-radius: 12px 0 0 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100vh;
+    position: relative;
 }
 
 .filter-group {
@@ -41,58 +51,32 @@ html, body {
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #f8f9fa;
+    font-size: 13px;
 }
 
-/* Main Content Area */
+/* Scrollbar */
+.right-panel::-webkit-scrollbar { width: 6px; }
+.right-panel::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 8px;
+}
+
+/* ==========================================================
+   MAIN CONTENT AREA
+   ========================================================== */
 .main-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 15px 20px; /* Jarak sama ke atas & samping */
+    padding: 0;
     box-sizing: border-box;
+    height: 100vh;
 }
 
-/* Dashboard Card */
-.dashboard-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-}
-
-/* Table Section */
-#table-container {
-    flex: 0 0 auto;
-    max-height: 35vh;
-    overflow: auto;
-}
-
-table thead th {
-    white-space: nowrap;
-}
-
-/* Map Section */
-#map-container {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-#map, #cctv-map, #ews-map {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    border: 2px solid #dee2e6;
-}
-
-/* Dashboard Containers */
+/* ==========================================================
+   DASHBOARD CONTAINERS
+   ========================================================== */
 .dashboard-container {
     display: none;
     flex-direction: column;
@@ -102,40 +86,57 @@ table thead th {
 
 .dashboard-container.active {
     display: flex;
+    padding: 0;
+    gap: 0;
 }
 
-/* ✅ CCTV Section (dibetulkan jaraknya) */
-#cctv-slider {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px; /* jarak antar kartu: atas, bawah, kiri, kanan */
-    padding: 20px; /* jarak dari tepi kontainer */
-    background: #f9fafb;
-    border-radius: 12px;
-    margin: 0; /* hilangkan margin bawah */
-    box-sizing: border-box;
+/* ==========================================================
+   CCTV SLIDER SECTION
+   ========================================================== */
+.cctv-slider-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto 10px auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 50px; /* ruang untuk tombol panah */
 }
 
-/* CCTV Card */
+/* Track berisi kartu CCTV */
+.cctv-track {
+    display: flex;
+    align-items: stretch;
+    transition: transform 0.45s ease;
+    gap: 16px;
+    padding-left: 43%; /* biar foto pertama gak kepotong kiri */
+}
+
+
+/* Kartu CCTV */
 .cctv-card {
+    flex: 0 0 23%; /* kira-kira 4 per baris */
+    min-width: 260px;
+    max-width: 320px;
     position: relative;
     overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
     background: #fff;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.25s ease;
+    cursor: pointer;
 }
 
 .cctv-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
 }
 
 .cctv-card img {
     width: 100%;
-    height: 160px;
+    height: 200px;
     object-fit: cover;
-    border-radius: 12px;
+    display: block;
 }
 
 .cctv-card .caption {
@@ -144,18 +145,195 @@ table thead th {
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.6);
-    color: white;
+    color: #fff;
     font-size: 13px;
     padding: 6px 10px;
-    border-radius: 0 0 12px 12px;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 0 0 8px 8px;
 }
 
-/* Scrollbar */
-.right-panel::-webkit-scrollbar {
-    width: 6px;
+/* ==========================================================
+   TOMBOL SCROLL SLIDER (PANAH)
+   ========================================================== */
+.cctv-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.45);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.25s, transform 0.25s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-.right-panel::-webkit-scrollbar-thumb {
-    background: #bbb;
+.cctv-scroll-btn.prev { left: 8px; }
+.cctv-scroll-btn.next { right: 8px; }
+
+.cctv-scroll-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.cctv-scroll-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    transform: translateY(-50%) scale(1);
+}
+
+/* ==========================================================
+   CCTV MODAL POPUP
+   ========================================================== */
+#cctvModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.35s forwards ease;
+}
+
+#cctvModal.fade-out {
+    animation: fadeOut 0.35s forwards ease;
+}
+
+#modal-content {
+    position: relative;
+    background: #000;
+    border-radius: 10px;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+#modal-image {
+    max-width: 100%;
+    max-height: 80vh;
     border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+#modal-title {
+    color: white;
+    padding: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ==========================================================
+   MODAL BUTTONS
+   ========================================================== */
+.modal-btn {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+#closeModal {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+}
+
+#prevModal, #nextModal {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 55px;
+    height: 55px;
+    font-size: 28px;
+}
+
+#prevModal { left: 25px; }
+#nextModal { right: 25px; }
+
+/* ==========================================================
+   MAP SECTION
+   ========================================================== */
+#map, #cctv-map, #ews-map {
+    flex: 1;
+    width: 100%;
+    height: 85vh;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* ==========================================================
+   ANIMATIONS
+   ========================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95); }
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width: 1200px) {
+    .cctv-card { flex: 0 0 30%; }
+}
+
+@media (max-width: 992px) {
+    .cctv-card { flex: 0 0 45%; }
+}
+
+@media (max-width: 768px) {
+    .right-panel {
+        min-width: 100%;
+        max-width: 100%;
+        border-right: none;
+        box-shadow: none;
+        height: auto;
+    }
+    .main-area {
+        height: auto;
+        overflow-y: visible;
+    }
+    .cctv-slider-wrapper { padding: 0 35px; }
+    .cctv-card {
+        flex: 0 0 85%;
+        margin: 0 auto;
+    }
+    .cctv-scroll-btn {
+        width: 38px;
+        height: 38px;
+    }
+    #modal-image {
+        max-height: 70vh;
+    }
 }

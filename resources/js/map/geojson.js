@@ -1,23 +1,43 @@
 // ==========================================================
-// resources/js/map/geojson.js
+// FILE: resources/js/map/geojson.js
+// Deskripsi: Daftar file GeoJSON & fungsi pemuatannya
 // ==========================================================
 
-// 🔹 Memuat GeoJSON dari folder public/geojson/
-export async function loadRegionsGeoJson() {
-  try {
-    const res = await fetch("/geojson/data.json"); // Path ke public/geojson/
-    const data = await res.json();
+// ⬇️ Ini yang kamu lupa di-export
+export const geojsonFiles = [
+  { id: 1, name: "Wilayah Biru", path: "/geojson/map biru5.geojson", color: "#007bff" },
+  { id: 2, name: "Wilayah Coklat", path: "/geojson/map coklat1.geojson", color: "#8B4513" },
+  { id: 3, name: "Wilayah Ijo Muda", path: "/geojson/map ijomuda4.geojson", color: "#28a745" },
+  { id: 4, name: "Wilayah Jitua", path: "/geojson/map jitua2.geojson", color: "#17a2b8" },
+  { id: 5, name: "Wilayah Ungu", path: "/geojson/map ungu3.geojson", color: "#6f42c1" },
+];
 
-    // Bungkus dalam array agar mudah di-loop di initmap.js
-    return [{ id: 1, name: "Wilayah Utama", geojson: data }];
-  } catch (err) {
-    console.error("❌ Gagal memuat GeoJSON:", err);
-    return [];
-  }
+// Opsional — kalau kamu mau punya fungsi helper juga
+export function loadGeoJSONLayers(map) {
+  geojsonFiles.forEach(({ path, color }) => {
+    fetch(path)
+      .then(res => res.json())
+      .then(data => {
+        const layer = new google.maps.Data({ map });
+        layer.addGeoJson(data);
+        layer.setStyle({
+          fillColor: color,
+          fillOpacity: 0.35,
+          strokeColor: color,
+          strokeWeight: 1.2,
+        });
+
+        layer.addListener("mouseover", (event) => {
+          layer.overrideStyle(event.feature, {
+            fillColor: "#ffaa00",
+            fillOpacity: 0.55,
+          });
+        });
+
+        layer.addListener("mouseout", (event) => {
+          layer.revertStyle(event.feature);
+        });
+      })
+      .catch(err => console.error(`❌ Gagal memuat ${path}:`, err));
+  });
 }
-
-// 🔹 Variabel global yang akan diimpor di initmap.js
-export let regionsGeoJson = [];
-
-// 🔹 Muat otomatis saat diimport
-loadRegionsGeoJson().then(data => (regionsGeoJson = data));
