@@ -1,5 +1,5 @@
 // ==========================================================
-// DASHBOARD CCTV DENGAN POPUP IMAGE, MAP, & SLIDER RESPONSIF
+// DASHBOARD CCTV DENGAN POPUP IMAGE, MAP, & SLIDER RESPONSIF (FINAL)
 // ==========================================================
 
 const cctvData = [
@@ -15,6 +15,7 @@ let cctvMarkers = [];
 let activeInfoWindow = null;
 let currentIndex = 0;
 let carouselIndex = 0;
+
 let carouselState = {
   container: null,
   track: null,
@@ -33,6 +34,7 @@ export function initCctvDashboard() {
 
   const mapElement = document.getElementById("cctv-map");
   const gridContainer = document.getElementById("cctv-slider");
+
   if (!mapElement || !gridContainer) {
     console.error("❌ Elemen peta atau grid CCTV tidak ditemukan.");
     return;
@@ -62,7 +64,7 @@ export function initCctvDashboard() {
           encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" width="45" height="70" viewBox="0 0 45 70">
               <rect x="21" y="35" width="3" height="30" fill="#FFFFFF" />
-              <circle cx="22.5" cy="25" r="20" fill="#2196F3" stroke="white" stroke-width="2" />
+              <circle cx="22.5" cy="25" r="20" fill="#006400" stroke="white" stroke-width="2" />
               <image href="/public/assets/images/icons/cctv.png" x="8" y="10" width="28" height="28"/>
             </svg>
           `),
@@ -168,7 +170,7 @@ function moveCarousel(direction = 1) {
 
 function updateCarouselTransform() {
   const { track, cardWidth, gap } = carouselState;
-  const offset = 15; // biar gambar pertama gak kepotong kiri
+  const offset = 15;
   const x = -(carouselIndex * (cardWidth + gap)) + offset;
   track.style.transform = `translateX(${x}px)`;
 }
@@ -251,30 +253,48 @@ function closeCctvModal() {
 }
 
 // ==========================================================
-// SWITCH VIEW
+// SWITCH VIEW (DENGAN MAP FULLSCREEN)
 // ==========================================================
 export function applyCctvView(selected) {
   const mapCctv = document.getElementById("cctv-map");
   const cctvSlider = document.getElementById("cctv-slider");
+  const sidebar = document.querySelector(".sidebar, .sidebar-container, #sidebar");
+
   if (!mapCctv || !cctvSlider) return;
 
-  mapCctv.style.display = "none";
-  cctvSlider.style.display = "none";
+  mapCctv.classList.add("fade");
+  cctvSlider.classList.add("fade");
 
-  switch (selected) {
-    case "cctv-only":
-      cctvSlider.style.display = "block";
-      renderCctvGrid(cctvSlider);
-      break;
-    case "maps-only":
-      mapCctv.style.display = "block";
-      break;
-    default:
-      mapCctv.style.display = "block";
-      cctvSlider.style.display = "block";
-      renderCctvGrid(cctvSlider);
-      break;
-  }
+  setTimeout(() => {
+    mapCctv.style.display = "none";
+    cctvSlider.style.display = "none";
+    cctvSlider.innerHTML = "";
+    mapCctv.classList.remove("fullscreen-map");
+    if (sidebar) sidebar.classList.remove("hide-sidebar");
+
+    switch (selected) {
+      case "cctv-only":
+        cctvSlider.style.display = "block";
+        renderCctvGrid(cctvSlider);
+        break;
+
+      case "maps-only":
+        mapCctv.style.display = "block";
+        mapCctv.classList.add("fullscreen-map"); // full layar
+        if (sidebar) sidebar.classList.add("hide-sidebar"); // sembunyikan sidebar
+        if (cctvMap) google.maps.event.trigger(cctvMap, "resize");
+        break;
+
+      default:
+        mapCctv.style.display = "block";
+        cctvSlider.style.display = "block";
+        renderCctvGrid(cctvSlider);
+        break;
+    }
+
+    mapCctv.classList.remove("fade");
+    cctvSlider.classList.remove("fade");
+  }, 300);
 }
 
 // ==========================================================

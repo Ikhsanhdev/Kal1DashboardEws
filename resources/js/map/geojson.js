@@ -8,7 +8,7 @@ export const geojsonFiles = [
   { id: 1, name: "Wilayah Biru", path: "/geojson/map biru5.geojson", color: "#007bff" },
   { id: 2, name: "Wilayah Coklat", path: "/geojson/map coklat1.geojson", color: "#8B4513" },
   { id: 3, name: "Wilayah Ijo Muda", path: "/geojson/map ijomuda4.geojson", color: "#28a745" },
-  { id: 4, name: "Wilayah Jitua", path: "/geojson/map jitua2.geojson", color: "#17a2b8" },
+  { id: 4, name: "Wilayah Ijo tua", path: "/geojson/map ijotua2.geojson", color: "#17a2b8" },
   { id: 5, name: "Wilayah Ungu", path: "/geojson/map ungu3.geojson", color: "#6f42c1" },
 ];
 
