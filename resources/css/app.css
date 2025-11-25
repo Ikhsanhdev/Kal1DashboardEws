@@ -1,64 +1,133 @@
 /* ==========================================================
-   GLOBAL LAYOUT
+   GLOBAL LAYOUT (scroll diaktifkan)
    ========================================================== */
 html, body {
     height: 100%;
-    overflow: hidden;
+    /* Izinkan halaman scroll secara global */
+    overflow-y: auto;
+    overflow-x: hidden;
     background: #f5f6fa;
     font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
     color: #333;
     margin: 0;
-}
+}   
 
 .d-flex.h-100 {
-    height: 100vh;
-    overflow: hidden;
+    /* Wrapper utama mengikuti tinggi konten, minimal setinggi viewport */
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    overflow: visible;
+    /* Tidak ada padding khusus di sini; jarak diatur per-komponen (sidebar, main-area) */
 }
 
 /* ==========================================================
-   SIDEBAR FILTER PANEL
+   SIDEBAR FILTER PANEL (KANAN)
    ========================================================== */
 .right-panel {
-    min-width: 340px;
-    max-width: 400px;
-    border-right: 1px solid #e0e0e0;
-    background: #fff;
-    padding: 18px;
-    border-radius: 12px 0 0 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    overflow-y: auto;
+    /* Lebar panel mirip sidebar FEWS */
+    min-width: 280px;
+    max-width: 320px;
+
+    /* Jadikan seperti kartu tersendiri */
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
+
+    /* Ruang dalam panel, mirip contoh: tidak terlalu sempit/tidak terlalu lebar */
+    padding: 20px 26px 24px; /* top 20, kiri/kanan 26, bottom 24 */
+    /* Jarak 24px dari tepi kiri container, dan gap 24px ke konten kanan */
+    margin: 16px 24px 16px 0;
+
+    overflow-y: auto; /* hanya panel ini yang scroll */
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    height: 100vh;
+    gap: 12px; /* jarak antar group di dalam panel */
+
+    /* Tinggi ikut konten, dengan batas dari JS adjustDashboardHeight */
+    height: auto;
     position: relative;
 }
 
 .filter-group {
-    margin-bottom: 15px;
+    margin-bottom: 14px; /* kembali sedikit lebih rapat, seperti contoh */
 }
 
 .filter-group label {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
     margin-bottom: 4px;
     display: block;
+    color: #4b5563; /* abu gelap seperti desain */
 }
 
 .filter-group select {
     width: 100%;
-    padding: 6px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f8f9fa;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
     font-size: 13px;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-/* Scrollbar */
-.right-panel::-webkit-scrollbar { width: 6px; }
+.filter-group select:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+}
+
+.left-panel {
+    min-width: 250px;
+    max-width: 280px;
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    padding: 18px;
+    position: relative;
+    z-index: 10;
+    overflow: hidden; /* ⛔ biar tetap tidak ikut scroll */
+}
+
+/* Scrollbar Custom */
+.right-panel::-webkit-scrollbar { width: 8px; }
 .right-panel::-webkit-scrollbar-thumb {
-    background: #bbb;
-    border-radius: 8px;
+    background: #bcbcbc;
+    border-radius: 6px;
+}
+.right-panel::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+.right-panel {
+    scrollbar-width: thin;
+    scrollbar-color: #bcbcbc #f0f0f0;
+}
+
+.filter-group {
+    margin-bottom: 14px;
+}
+.filter-group label {
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+    display: block;
+    color: #4b5563;
+}
+.filter-group select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+    font-size: 13px;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 /* ==========================================================
@@ -68,11 +137,17 @@ html, body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    padding: 0;
-    box-sizing: border-box;
-    height: 100vh;
+    height: auto;
+    /* Area maps/table ikut tinggi konten, scroll di-handle oleh body */
+    overflow-y: visible;
+    overflow-x: hidden;
+    position: relative;
+    /* Padding kiri 32px, padding kanan dibuat sedikit lebih besar
+       supaya setelah dikurangi lebar scrollbar, jarak kiri-kanan terlihat sama */
+    padding: 16px 48px 24px 32px; /* top 16, kanan 48, bawah 24, kiri 32 */
+    margin: 0;
 }
+
 
 /* ==========================================================
    DASHBOARD CONTAINERS
@@ -80,14 +155,126 @@ html, body {
 .dashboard-container {
     display: none;
     flex-direction: column;
-    height: 100%;
-    overflow: hidden;
+    /* Biarkan tinggi mengikuti konten; scroll ditangani oleh .main-area */
+    min-height: 100%;
+    overflow: visible;
 }
 
 .dashboard-container.active {
     display: flex;
     padding: 0;
     gap: 0;
+}
+
+/* Dashboard Data: gunakan layout block biasa agar map & tabel tersusun vertikal rapi */
+#dashboard-data-container.dashboard-container.active {
+    display: block;
+}
+/* Kartu konten utama (map, tabel, dll.) */
+.dashboard-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: none; /* ubah dari 1px solid #e5e5e5; */
+}
+/* Kartu map dashboard data agar tinggi map konsisten seperti desain */
+.dashboard-map-card {
+    height: auto;
+    padding: 0;
+    overflow: hidden;
+    position: relative; /* supaya overlay legend bisa absolute di dalam card */
+}
+
+/* Map utama dashboard data */
+#map {
+    width: 100%;
+    height: 460px; /* tinggi disesuaikan agar mirip contoh referensi */
+    border-radius: 12px; /* semua sisi punya radius yang sama */
+}
+
+/* Table card menempel ke map seperti satu panel, tanpa efek kartu terpisah */
+#dashboard-data-container #table-container.dashboard-card {
+    margin-top: 0;
+    border-radius: 0; /* hilangkan radius agar tidak terlihat seperti card khusus */
+    /* Hilangkan padding kiri–kanan agar tabel sejajar dengan tepi map */
+    padding: 16px 0 8px;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Styling tabel Dashboard Data agar rata kanan kiri */
+#dashboard-table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+#dashboard-table thead th {
+    background-color: #111827;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
+    border-color: #111827;
+}
+
+#dashboard-table tbody td {
+    font-size: 13px;
+    padding: 8px 14px;
+}
+
+/* Search bar di header tabel Dashboard Data */
+.table-search-wrapper {
+    min-width: 260px;
+}
+
+.table-search-input {
+    padding-left: 32px;
+    border-radius: 999px;
+    border-color: #d1d5db;
+    background-color: #f9fafb;
+    font-size: 13px;
+    height: 34px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.table-search-input:focus {
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+    border-color: #2563eb;
+    background-color: #ffffff;
+}
+
+.table-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* Header judul Dashboard Data di area kanan */
+.dashboard-header {
+    padding: 4px 4px 8px;
+}
+
+.dashboard-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Header bar di atas tabel: sejajarkan judul dan search */
+.table-header-bar {
+    align-items: center !important;
+}
+
+.table-header-bar h5 {
+    line-height: 1.2;
+    margin-bottom: 0;
 }
 
 /* ==========================================================
@@ -101,40 +288,50 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 50px; /* ruang untuk tombol panah */
+    padding: 0 50px;
 }
 
-/* Track berisi kartu CCTV */
 .cctv-track {
     display: flex;
     align-items: stretch;
     transition: transform 0.45s ease;
     gap: 16px;
-    padding-left: 43%; /* biar foto pertama gak kepotong kiri */
+    padding-left: 50%;
 }
 
+/* Grid CCTV Only: 4 kolom di desktop, wrap ke bawah */
+.cctv-grid-only {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    padding: 0;
+}
+/* Di mode grid-only, kartu ikut lebar kolom grid */
+.cctv-grid-only .cctv-card {
+    flex: unset;        /* matikan aturan flex: 0 0 23% */
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+}
 
-/* Kartu CCTV */
 .cctv-card {
-    flex: 0 0 23%; /* kira-kira 4 per baris */
+    flex: 0 0 23%;
     min-width: 260px;
     max-width: 320px;
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    background: transparent;                /* tidak ada kartu putih */
+    box-shadow: none;                       /* hilangkan bayangan */
     transition: transform 0.25s ease;
     cursor: pointer;
 }
 
-.cctv-card:hover {
-    transform: translateY(-4px);
-}
+.cctv-card:hover { transform: translateY(-4px); }
 
 .cctv-card img {
     width: 100%;
-    height: 200px;
+    height: 180px;
     object-fit: cover;
     display: block;
 }
@@ -154,7 +351,7 @@ html, body {
 }
 
 /* ==========================================================
-   TOMBOL SCROLL SLIDER (PANAH)
+   TOMBOL SCROLL SLIDER
    ========================================================== */
 .cctv-scroll-btn {
     position: absolute;
@@ -175,7 +372,6 @@ html, body {
     transition: background-color 0.25s, transform 0.25s;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
-
 .cctv-scroll-btn.prev { left: 8px; }
 .cctv-scroll-btn.next { right: 8px; }
 
@@ -183,7 +379,6 @@ html, body {
     background-color: rgba(0, 0, 0, 0.7);
     transform: translateY(-50%) scale(1.1);
 }
-
 .cctv-scroll-btn:disabled {
     opacity: 0.35;
     cursor: default;
@@ -204,11 +399,9 @@ html, body {
     backdrop-filter: blur(3px);
     animation: fadeIn 0.35s forwards ease;
 }
-
 #cctvModal.fade-out {
     animation: fadeOut 0.35s forwards ease;
 }
-
 #modal-content {
     position: relative;
     background: #000;
@@ -220,14 +413,12 @@ html, body {
     align-items: center;
     overflow: hidden;
 }
-
 #modal-image {
     max-width: 100%;
     max-height: 80vh;
     border-radius: 8px;
     transition: opacity 0.3s ease;
 }
-
 #modal-title {
     color: white;
     padding: 8px;
@@ -251,11 +442,9 @@ html, body {
     justify-content: center;
     align-items: center;
 }
-
 .modal-btn:hover {
     background: rgba(255, 255, 255, 0.25);
 }
-
 #closeModal {
     top: 10px;
     right: 10px;
@@ -263,7 +452,6 @@ html, body {
     height: 40px;
     font-size: 22px;
 }
-
 #prevModal, #nextModal {
     top: 50%;
     transform: translateY(-50%);
@@ -271,23 +459,162 @@ html, body {
     height: 55px;
     font-size: 28px;
 }
-
 #prevModal { left: 25px; }
 #nextModal { right: 25px; }
 
 /* ==========================================================
    MAP SECTION
    ========================================================== */
-#map, #cctv-map, #ews-map {
-    flex: 1;
+/* Map dashboard data: tinggi fixed agar selalu terlihat */
+#map {
     width: 100%;
-    height: 85vh;
+    height: 500px; /* tinggi diperkecil agar mirip contoh */
     border: none;
-    border-radius: 0;
+    border-radius: 12px 12px 0 0; /* menempel dengan kartu tabel di bawahnya */
     box-shadow: none;
     background: transparent;
+    position: relative;
 }
 
+/* Map CCTV & EWS mengikuti tinggi container card masing-masing */
+/* CCTV map: tinggi fix supaya halaman lebih panjang dan bisa discroll */
+#cctv-map {
+    width: 100%;
+    height: 480px;        /* boleh kamu sesuaikan 450–500px sesuai selera */
+    border: none;
+    border-radius: 12px;
+    box-shadow: none;
+    background: transparent;
+    position: relative;
+}
+
+
+/* Map EWS: mirip map besar FEWS */
+#ews-map {
+    width: 100%;
+    height: 480px;
+    border: none;
+    border-radius: 12px 12px 0 0;
+    box-shadow: none;
+    background: transparent;
+    position: relative;
+}
+
+#dashboard-cctv-container .dashboard-card:first-child {
+    margin-bottom: 16px;  /* atau 20px */
+}
+
+#dashboard-ews-container.dashboard-container.active {
+    display: block;
+}
+
+/* Biar header tetap rapi saat scroll */
+#ews-table {
+    margin-bottom: 0;
+}
+/* Tabel EWS menempel ke map seperti satu panel */
+#dashboard-ews-container #ews-table-container.dashboard-card {
+    margin-top: 0;
+    border-radius: 0 0 12px 12px;
+    padding: 16px 0 8px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Styling tabel EWS mirip Dashboard Data */
+#ews-table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+#ews-table thead th {
+    background-color: #111827;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
+    border-color: #111827;
+}
+
+#ews-table tbody td {
+    font-size: 13px;
+    padding: 8px 14px;
+}
+/* Sembunyikan overlay custom di atas map agar layout bersih */
+#infoPopup,
+#wilayahList {
+    display: none !important;
+}
+
+/* ==========================================================
+   MAP LEGEND (KIRI BAWAH)
+   ========================================================== */
+.map-info-box {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    max-width: 240px;
+    line-height: 1.4;
+}
+.map-info-box .region-color {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.map-info-box .region-name {
+    font-weight: 600;
+}
+
+/* ==========================================================
+   MAP DETAIL BOX (KIRI ATAS)
+   ========================================================== */
+.map-detail-box {
+    position: absolute;
+    top: 80px;
+    left: 16px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #111827;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    min-width: 240px;
+    max-width: 280px;
+    line-height: 1.4;
+    display: none;
+}
+.map-detail-box strong {
+    font-weight: 600;
+}
+
+/* ==========================================================
+   GOOGLE MAPS POPUP CUSTOM STYLE
+   ========================================================== */
+.gm-style .gm-style-iw-c {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    padding: 8px 10px !important;
+}
+.gm-style .gm-style-iw-d {
+    overflow: hidden !important;
+}
+.gm-style .gm-style-iw-t::after {
+    background: #fff;
+}
 
 /* ==========================================================
    ANIMATIONS
@@ -296,7 +623,6 @@ html, body {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
-
 @keyframes fadeOut {
     from { opacity: 1; transform: scale(1); }
     to { opacity: 0; transform: scale(0.95); }
@@ -305,14 +631,29 @@ html, body {
 /* ==========================================================
    RESPONSIVE
    ========================================================== */
-@media (max-width: 1200px) {
-    .cctv-card { flex: 0 0 30%; }
+   @media (max-width: 1200px) {
+    .cctv-grid-only {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 992px) {
-    .cctv-card { flex: 0 0 45%; }
+    .cctv-grid-only {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
+@media (max-width: 576px) {
+    .cctv-grid-only {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 1200px) {
+    .cctv-card { flex: 0 0 30%; }
+}
+@media (max-width: 992px) {
+    .cctv-card { flex: 0 0 45%; }
+}
 @media (max-width: 768px) {
     .right-panel {
         min-width: 100%;
@@ -336,5 +677,49 @@ html, body {
     }
     #modal-image {
         max-height: 70vh;
+    }
+}
+
+/* Hilangkan efek container bawaan template di halaman dashboard */
+.layout-wrapper {
+    max-width: 100%;
+    width: 100%;
+}
+
+.page-content {
+    max-width: 100%;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+/* Hilangkan border khusus untuk kartu CCTV dan kartu yang berisi map */
+#dashboard-cctv-container .dashboard-card,
+#dashboard-data-container .dashboard-map-card,
+#dashboard-ews-container .dashboard-card {
+    border: none;
+}
+/* Hilangkan kartu putih di sekitar slider dan map CCTV */
+#dashboard-cctv-container .dashboard-card {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0 !important;   /* override p-2 dari Bootstrap */
+}
+
+/* ==========================================================
+   LOGIN CARD
+   ========================================================== */
+.login-card {
+    min-width: 360px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 576px) {
+    .login-card {
+        min-width: 0;
+        width: 100%;
+        margin: 0 16px;
     }
 }

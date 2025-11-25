@@ -3,13 +3,13 @@ import "selectize";
 import { applyCctvView } from "../dashboards/cctv.js";
 
 // =====================================================
-// 📦 Inisialisasi Filters
+// Inisialisasi Filters
 // =====================================================
 export function initFilters() {
-    console.log("✅ Filters initialized");
+    console.log("Filters initialized");
 
     // =====================================================
-    // 🔹 Opsi Filter per Dashboard
+    // Opsi Filter per Dashboard
     // =====================================================
     const options = {
         "dashboard-data": {
@@ -28,7 +28,7 @@ export function initFilters() {
             wilayah: ["Wilayah I", "Wilayah II", "Wilayah III"],
             view: ["Maps + CCTV", "Maps Only", "CCTV Only"],
         },
-        ews: {
+        "dashboard-ews": {
             ewstype: [
                 "Forecast",
                 "Nearcast",
@@ -39,7 +39,7 @@ export function initFilters() {
     };
 
     // =====================================================
-    // 🔹 Helper: Isi selectize dengan item dinamis
+    // Helper: Isi selectize dengan item dinamis
     // =====================================================
     const showSelect = (selector, items) => {
         const $select = $(selector);
@@ -64,70 +64,56 @@ export function initFilters() {
     };
 
     // =====================================================
-    // 🔹 Kontrol tampilan View (khusus Dashboard Data)
+    // Kontrol tampilan View (khusus Dashboard Data)
     // =====================================================
     const applyView = (selected) => {
         const tableContainer = document.getElementById("table-container");
-        const mapContainer = document.getElementById("map-container");
+        const mapContainer = document.getElementById("map");
 
         if (!tableContainer || !mapContainer) return;
 
-        // Sembunyikan semua dulu
+        // Reset display
         tableContainer.style.display = "none";
         mapContainer.style.display = "none";
 
-        // Tampilkan sesuai pilihan
+        // Hanya atur visibilitas; tinggi diatur oleh CSS
         switch (selected) {
             case "table-only":
                 tableContainer.style.display = "block";
-                tableContainer.style.height = "100%";
                 break;
 
             case "map-only":
                 mapContainer.style.display = "block";
-                mapContainer.style.height = "100%";
                 break;
 
-            default: // Table + Maps
+            default:
+                // "table-+-maps" atau nilai lain -> tampilkan keduanya
                 tableContainer.style.display = "block";
                 mapContainer.style.display = "block";
-                tableContainer.style.height = "250px";
-                mapContainer.style.height = "calc(100% - 250px)";
                 break;
         }
     };
 
     // =====================================================
-    // 🔹 Switch antar Dashboard Layout
+    // Switch antar Dashboard Layout
     // =====================================================
     const switchDashboardLayout = (type) => {
-        $(".dashboard-container").hide();
-
-        switch (type) {
-            case "dashboard-data":
-                $("#dashboard-data-container").show();
-                break;
-
-            case "dashboard-cctv":
-                $("#dashboard-cctv-container").show();
-                break;
-
-            case "ews":
-                $("#dashboard-ews-container").show();
-                break;
-        }
+        $(".dashboard-container").removeClass("active");
+        $(`#${type}-container`).addClass("active");
     };
 
     // =====================================================
-    // 🔹 Inisialisasi semua Selectize (kecuali dashboard-type)
+    // Inisialisasi semua Selectize (kecuali dashboard-type)
     // =====================================================
-    $("select").not("#dashboard-type").selectize({
-        create: false,
-        sortField: "text",
-    });
+    $("select")
+        .not("#dashboard-type")
+        .selectize({
+            create: false,
+            sortField: "text",
+        });
 
     // =====================================================
-    // 🔹 Inisialisasi Selectize utama (Dashboard Type)
+    // Inisialisasi Selectize utama (Dashboard Type)
     // =====================================================
     const dashboardTypeSelect = $("#dashboard-type")
         .selectize({
@@ -135,17 +121,22 @@ export function initFilters() {
             sortField: "text",
             placeholder: "Pilih Dashboard",
             onChange(value) {
-                // Sembunyikan semua group filter lain
+                // Sembunyikan semua group filter lain kecuali dashboard-type
                 $(".filter-group").not(":has(#dashboard-type)").hide();
 
-                // Tampilkan layout dashboard sesuai pilihan
+                // Tampilkan layout dashboard sesuai pilihan (CSS)
                 switchDashboardLayout(value);
+
+                // Panggil mekanisme utama di index.js
+                if (typeof window !== "undefined" && typeof window.initDashboard === "function") {
+                    window.initDashboard(value);
+                }
 
                 if (!value || !options[value]) return;
 
                 switch (value) {
                     // ========================================
-                    // 🟦 DASHBOARD DATA
+                    // DASHBOARD DATA
                     // ========================================
                     case "dashboard-data": {
                         showSelect("#filter-sebaran", options[value].sebaran);
@@ -165,7 +156,7 @@ export function initFilters() {
                     }
 
                     // ========================================
-                    // 🟨 DASHBOARD CCTV
+                    // DASHBOARD CCTV
                     // ========================================
                     case "dashboard-cctv": {
                         showSelect("#filter-kategori-cctv", options[value].kategori);
@@ -185,9 +176,9 @@ export function initFilters() {
                     }
 
                     // ========================================
-                    // 🟥 DASHBOARD EWS
+                    // DASHBOARD EWS
                     // ========================================
-                    case "ews": {
+                    case "dashboard-ews": {
                         showSelect("#filter-ews-type", options[value].ewstype);
                         $("#group-ews-type").show();
                         break;
@@ -197,7 +188,7 @@ export function initFilters() {
         })[0].selectize;
 
     // =====================================================
-    // 🔹 Set Default Dashboard (Data)
+    // Set Default Dashboard (Data)
     // =====================================================
     dashboardTypeSelect.setValue("dashboard-data");
     dashboardTypeSelect.onChange("dashboard-data");
