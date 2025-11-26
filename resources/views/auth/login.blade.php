@@ -67,5 +67,4 @@
                 </form>
             </div>
         </div>
-    </div>
-@endsectiony
+    </div> 

@@ -3,13 +3,13 @@ import "selectize";
 import { applyCctvView } from "../dashboards/cctv.js";
 
 // =====================================================
-// Inisialisasi Filters
+// 📦 Inisialisasi Filters
 // =====================================================
 export function initFilters() {
-    console.log("Filters initialized");
+    console.log("✅ Filters initialized");
 
     // =====================================================
-    // Opsi Filter per Dashboard
+    // 🔹 Opsi Filter per Dashboard
     // =====================================================
     const options = {
         "dashboard-data": {
@@ -39,7 +39,7 @@ export function initFilters() {
     };
 
     // =====================================================
-    // Helper: Isi selectize dengan item dinamis
+    // 🔹 Helper: Isi selectize dengan item dinamis
     // =====================================================
     const showSelect = (selector, items) => {
         const $select = $(selector);
@@ -64,7 +64,7 @@ export function initFilters() {
     };
 
     // =====================================================
-    // Kontrol tampilan View (khusus Dashboard Data)
+    // 🔹 Kontrol tampilan View (khusus Dashboard Data)
     // =====================================================
     const applyView = (selected) => {
         const tableContainer = document.getElementById("table-container");
@@ -72,11 +72,11 @@ export function initFilters() {
 
         if (!tableContainer || !mapContainer) return;
 
-        // Reset display
+        // Reset display dulu
         tableContainer.style.display = "none";
         mapContainer.style.display = "none";
 
-        // Hanya atur visibilitas; tinggi diatur oleh CSS
+        // Hanya atur visibilitas; tinggi diatur oleh CSS (.dashboard-map-card, dll.)
         switch (selected) {
             case "table-only":
                 tableContainer.style.display = "block";
@@ -86,8 +86,7 @@ export function initFilters() {
                 mapContainer.style.display = "block";
                 break;
 
-            default:
-                // "table-+-maps" atau nilai lain -> tampilkan keduanya
+            default: 
                 tableContainer.style.display = "block";
                 mapContainer.style.display = "block";
                 break;
@@ -95,25 +94,24 @@ export function initFilters() {
     };
 
     // =====================================================
-    // Switch antar Dashboard Layout
+    // 🔹 Switch antar Dashboard Layout
     // =====================================================
     const switchDashboardLayout = (type) => {
+        // Gunakan kelas .active seperti mekanisme utama di index.js
         $(".dashboard-container").removeClass("active");
         $(`#${type}-container`).addClass("active");
     };
 
     // =====================================================
-    // Inisialisasi semua Selectize (kecuali dashboard-type)
+    // 🔹 Inisialisasi semua Selectize (kecuali dashboard-type)
     // =====================================================
-    $("select")
-        .not("#dashboard-type")
-        .selectize({
-            create: false,
-            sortField: "text",
-        });
+    $("select").not("#dashboard-type").selectize({
+        create: false,
+        sortField: "text",
+    });
 
     // =====================================================
-    // Inisialisasi Selectize utama (Dashboard Type)
+    // 🔹 Inisialisasi Selectize utama (Dashboard Type)
     // =====================================================
     const dashboardTypeSelect = $("#dashboard-type")
         .selectize({
@@ -121,13 +119,14 @@ export function initFilters() {
             sortField: "text",
             placeholder: "Pilih Dashboard",
             onChange(value) {
-                // Sembunyikan semua group filter lain kecuali dashboard-type
+                // Sembunyikan semua group filter lain
                 $(".filter-group").not(":has(#dashboard-type)").hide();
 
                 // Tampilkan layout dashboard sesuai pilihan (CSS)
                 switchDashboardLayout(value);
 
-                // Panggil mekanisme utama di index.js
+                // Panggil mekanisme utama untuk inisialisasi dashboard
+                // (termasuk map data, CCTV, dan EWS) yang didefinisikan di index.js
                 if (typeof window !== "undefined" && typeof window.initDashboard === "function") {
                     window.initDashboard(value);
                 }
@@ -136,7 +135,7 @@ export function initFilters() {
 
                 switch (value) {
                     // ========================================
-                    // DASHBOARD DATA
+                    // 🟦 DASHBOARD DATA
                     // ========================================
                     case "dashboard-data": {
                         showSelect("#filter-sebaran", options[value].sebaran);
@@ -156,7 +155,7 @@ export function initFilters() {
                     }
 
                     // ========================================
-                    // DASHBOARD CCTV
+                    // 🟨 DASHBOARD CCTV
                     // ========================================
                     case "dashboard-cctv": {
                         showSelect("#filter-kategori-cctv", options[value].kategori);
@@ -176,7 +175,7 @@ export function initFilters() {
                     }
 
                     // ========================================
-                    // DASHBOARD EWS
+                    // 🟥 DASHBOARD EWS
                     // ========================================
                     case "dashboard-ews": {
                         showSelect("#filter-ews-type", options[value].ewstype);
@@ -188,7 +187,7 @@ export function initFilters() {
         })[0].selectize;
 
     // =====================================================
-    // Set Default Dashboard (Data)
+    // 🔹 Set Default Dashboard (Data)
     // =====================================================
     dashboardTypeSelect.setValue("dashboard-data");
     dashboardTypeSelect.onChange("dashboard-data");

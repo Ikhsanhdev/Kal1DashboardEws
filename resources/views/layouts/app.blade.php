@@ -18,19 +18,6 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""
     />
-
-    <!-- (Opsional) Tambahkan marker cluster jika digunakan -->
-    {{--
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
-    />
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
-    />
-    --}}
-
     @stack('styles')
 </head>
 <body>
@@ -134,11 +121,6 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""
     ></script>
-
-    <!-- (Opsional) Aktifkan marker cluster jika digunakan -->
-    {{--
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster-src.js"></script>
-    --}}
 
     @stack('scripts')
 </body>

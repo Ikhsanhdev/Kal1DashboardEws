@@ -7,18 +7,7 @@ import { geojsonFiles } from "./geojson.js";
 import { addRegionToList } from "./markers.js";
 import * as turf from "@turf/turf";
 
-/**
- * ==========================================================
- * Inisialisasi Google Map
- * ==========================================================
- * - Bisa diberi targetId spesifik ("map", "cctv-map", "ews-map")
- * - Jika tidak diberikan, otomatis deteksi elemen map aktif
- * - Memuat layer GeoJSON
- * - Menangani interaksi hover dan klik
- * - Menampilkan label wilayah
- * - Menyimpan instance map ke window.dashboardMap
- * ==========================================================
- */
+
 export function initMap(targetId) {
     // Temukan elemen peta yang aktif / sesuai target
     const mapElement =

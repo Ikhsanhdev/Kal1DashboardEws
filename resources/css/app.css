@@ -35,15 +35,15 @@ html, body {
     border: 1px solid #e5e7eb;
     box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
 
-    /* Ruang dalam panel, mirip contoh: tidak terlalu sempit/tidak terlalu lebar */
-    padding: 20px 26px 24px; /* top 20, kiri/kanan 26, bottom 24 */
+    /* Tambah ruang di dalam panel agar isi tidak terlalu mepet */
+    padding: 24px 36px 30px; /* top 24, left/right 36, bottom 30 */
     /* Jarak 24px dari tepi kiri container, dan gap 24px ke konten kanan */
     margin: 16px 24px 16px 0;
 
     overflow-y: auto; /* hanya panel ini yang scroll */
     display: flex;
     flex-direction: column;
-    gap: 12px; /* jarak antar group di dalam panel */
+    gap: 16px; /* jarak antar group di dalam panel */
 
     /* Tinggi ikut konten, dengan batas dari JS adjustDashboardHeight */
     height: auto;
@@ -51,7 +51,7 @@ html, body {
 }
 
 .filter-group {
-    margin-bottom: 14px; /* kembali sedikit lebih rapat, seperti contoh */
+    margin-bottom: 16px; /* sedikit lebih renggang antar filter */
 }
 
 .filter-group label {
@@ -142,10 +142,8 @@ html, body {
     overflow-y: visible;
     overflow-x: hidden;
     position: relative;
-    /* Padding kiri 32px, padding kanan dibuat sedikit lebih besar
-       supaya setelah dikurangi lebar scrollbar, jarak kiri-kanan terlihat sama */
-    padding: 16px 48px 24px 32px; /* top 16, kanan 48, bawah 24, kiri 32 */
-    margin: 0;
+    /* Tidak perlu margin kanan tambahan, karena padding container sudah 24px */
+    margin: 16px 0 16px 0;
 }
 
 
@@ -177,33 +175,29 @@ html, body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: 16px;
     margin-bottom: 16px;
-    border: none; /* ubah dari 1px solid #e5e5e5; */
+    border: 1px solid #e5e5e5;
 }
+
 /* Kartu map dashboard data agar tinggi map konsisten seperti desain */
 .dashboard-map-card {
     height: auto;
     padding: 0;
     overflow: hidden;
-    position: relative; /* supaya overlay legend bisa absolute di dalam card */
 }
 
 /* Map utama dashboard data */
 #map {
     width: 100%;
-    height: 460px; /* tinggi disesuaikan agar mirip contoh referensi */
-    border-radius: 12px; /* semua sisi punya radius yang sama */
+    height: 500px;
+    border-radius: 12px 12px 0 0;
 }
 
-/* Table card menempel ke map seperti satu panel, tanpa efek kartu terpisah */
+/* Table card menempel ke map seperti satu panel */
 #dashboard-data-container #table-container.dashboard-card {
     margin-top: 0;
-    border-radius: 0; /* hilangkan radius agar tidak terlihat seperti card khusus */
-    /* Hilangkan padding kiri–kanan agar tabel sejajar dengan tepi map */
-    padding: 16px 0 8px;
-    overflow: visible;
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    border-radius: 0 0 12px 12px;
+    padding: 0;
+    overflow: hidden;
 }
 
 /* Styling tabel Dashboard Data agar rata kanan kiri */
@@ -236,9 +230,6 @@ html, body {
     border-color: #d1d5db;
     background-color: #f9fafb;
     font-size: 13px;
-    height: 34px;
-    padding-top: 6px;
-    padding-bottom: 6px;
 }
 
 .table-search-input:focus {
@@ -267,16 +258,6 @@ html, body {
     color: #333;
 }
 
-/* Header bar di atas tabel: sejajarkan judul dan search */
-.table-header-bar {
-    align-items: center !important;
-}
-
-.table-header-bar h5 {
-    line-height: 1.2;
-    margin-bottom: 0;
-}
-
 /* ==========================================================
    CCTV SLIDER SECTION
    ========================================================== */
@@ -296,22 +277,7 @@ html, body {
     align-items: stretch;
     transition: transform 0.45s ease;
     gap: 16px;
-    padding-left: 50%;
-}
-
-/* Grid CCTV Only: 4 kolom di desktop, wrap ke bawah */
-.cctv-grid-only {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    padding: 0;
-}
-/* Di mode grid-only, kartu ikut lebar kolom grid */
-.cctv-grid-only .cctv-card {
-    flex: unset;        /* matikan aturan flex: 0 0 23% */
-    min-width: 0;
-    max-width: none;
-    width: 100%;
+    padding-left: 43%;
 }
 
 .cctv-card {
@@ -320,9 +286,9 @@ html, body {
     max-width: 320px;
     position: relative;
     overflow: hidden;
-    border-radius: 10px;
-    background: transparent;                /* tidak ada kartu putih */
-    box-shadow: none;                       /* hilangkan bayangan */
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     transition: transform 0.25s ease;
     cursor: pointer;
 }
@@ -331,7 +297,7 @@ html, body {
 
 .cctv-card img {
     width: 100%;
-    height: 180px;
+    height: 200px;
     object-fit: cover;
     display: block;
 }
@@ -465,80 +431,33 @@ html, body {
 /* ==========================================================
    MAP SECTION
    ========================================================== */
-/* Map dashboard data: tinggi fixed agar selalu terlihat */
+/* Map dashboard data: tinggi fixed agar selalu terlihat (DEBUG: border & background) */
 #map {
     width: 100%;
-    height: 500px; /* tinggi diperkecil agar mirip contoh */
-    border: none;
-    border-radius: 12px 12px 0 0; /* menempel dengan kartu tabel di bawahnya */
+    height: 500px;
+    border: 2px solid blue;        /* DEBUG: supaya area map kelihatan */
+    border-radius: 8px;
     box-shadow: none;
-    background: transparent;
+    background: #e0e0e0;          /* DEBUG: abu-abu */
     position: relative;
 }
 
-/* Map CCTV & EWS mengikuti tinggi container card masing-masing */
-/* CCTV map: tinggi fix supaya halaman lebih panjang dan bisa discroll */
-#cctv-map {
+#cctv-map, #ews-map {
+    flex: 1;
     width: 100%;
-    height: 480px;        /* boleh kamu sesuaikan 450–500px sesuai selera */
+    height: 100%;
     border: none;
-    border-radius: 12px;
+    border-radius: 0;
     box-shadow: none;
     background: transparent;
     position: relative;
 }
 
-
-/* Map EWS: mirip map besar FEWS */
-#ews-map {
-    width: 100%;
-    height: 480px;
-    border: none;
-    border-radius: 12px 12px 0 0;
-    box-shadow: none;
-    background: transparent;
+/* Pastikan container card untuk EWS memenuhi tinggi dashboard
+   tanpa mengubah perilaku map data dan CCTV */
+#dashboard-ews-container .dashboard-card {
+    height: 100%;
     position: relative;
-}
-
-#dashboard-cctv-container .dashboard-card:first-child {
-    margin-bottom: 16px;  /* atau 20px */
-}
-
-#dashboard-ews-container.dashboard-container.active {
-    display: block;
-}
-
-/* Biar header tetap rapi saat scroll */
-#ews-table {
-    margin-bottom: 0;
-}
-/* Tabel EWS menempel ke map seperti satu panel */
-#dashboard-ews-container #ews-table-container.dashboard-card {
-    margin-top: 0;
-    border-radius: 0 0 12px 12px;
-    padding: 16px 0 8px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
-/* Styling tabel EWS mirip Dashboard Data */
-#ews-table {
-    width: 100% !important;
-    border-collapse: collapse;
-}
-
-#ews-table thead th {
-    background-color: #111827;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 13px;
-    border-color: #111827;
-}
-
-#ews-table tbody td {
-    font-size: 13px;
-    padding: 8px 14px;
 }
 /* Sembunyikan overlay custom di atas map agar layout bersih */
 #infoPopup,
@@ -547,9 +466,9 @@ html, body {
 }
 
 /* ==========================================================
-   MAP LEGEND (KIRI BAWAH)
+   MAP INFO BOX (KIRI BAWAH)
    ========================================================== */
-.map-info-box {
+#map-info-box {
     position: absolute;
     bottom: 16px;
     left: 16px;
@@ -564,7 +483,7 @@ html, body {
     max-width: 240px;
     line-height: 1.4;
 }
-.map-info-box .region-color {
+#map-info-box .region-color {
     display: inline-block;
     width: 14px;
     height: 14px;
@@ -572,31 +491,7 @@ html, body {
     margin-right: 6px;
     vertical-align: middle;
 }
-.map-info-box .region-name {
-    font-weight: 600;
-}
-
-/* ==========================================================
-   MAP DETAIL BOX (KIRI ATAS)
-   ========================================================== */
-.map-detail-box {
-    position: absolute;
-    top: 80px;
-    left: 16px;
-    background: rgba(255, 255, 255, 0.97);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #111827;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    z-index: 9999;
-    min-width: 240px;
-    max-width: 280px;
-    line-height: 1.4;
-    display: none;
-}
-.map-detail-box strong {
+#map-info-box .region-name {
     font-weight: 600;
 }
 
@@ -631,23 +526,6 @@ html, body {
 /* ==========================================================
    RESPONSIVE
    ========================================================== */
-   @media (max-width: 1200px) {
-    .cctv-grid-only {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 992px) {
-    .cctv-grid-only {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 576px) {
-    .cctv-grid-only {
-        grid-template-columns: 1fr;
-    }
-}
 @media (max-width: 1200px) {
     .cctv-card { flex: 0 0 30%; }
 }
@@ -677,49 +555,5 @@ html, body {
     }
     #modal-image {
         max-height: 70vh;
-    }
-}
-
-/* Hilangkan efek container bawaan template di halaman dashboard */
-.layout-wrapper {
-    max-width: 100%;
-    width: 100%;
-}
-
-.page-content {
-    max-width: 100%;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-}
-/* Hilangkan border khusus untuk kartu CCTV dan kartu yang berisi map */
-#dashboard-cctv-container .dashboard-card,
-#dashboard-data-container .dashboard-map-card,
-#dashboard-ews-container .dashboard-card {
-    border: none;
-}
-/* Hilangkan kartu putih di sekitar slider dan map CCTV */
-#dashboard-cctv-container .dashboard-card {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    padding: 0 !important;   /* override p-2 dari Bootstrap */
-}
-
-/* ==========================================================
-   LOGIN CARD
-   ========================================================== */
-.login-card {
-    min-width: 360px;
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
-}
-
-@media (max-width: 576px) {
-    .login-card {
-        min-width: 0;
-        width: 100%;
-        margin: 0 16px;
     }
 }
